@@ -1,11 +1,23 @@
 import levrt
-from lev.aorona.levicupp import hello
+from lev.aorona.levicupp import CeWLCUPP
 
 async def main():
-    doc = await hello()
-    data = await doc.get()
-    print(data["msg"])
-
+    print("""
+    ----------------------
+    Testing CeWL + CUPP
+    ----------------------
+    """)
+    doc = await CeWLCUPP.Wordlist(
+        url = 'https://levi.zone/',
+        depth = 1,
+        min_length = 5,
+        offsite = False,
+        word_list = None,
+        concatenate = False,
+        special_chars = False,
+        random_nums = False,
+        leet = False,
+    )
 
 if __name__ == "__main__":
     levrt.run(main())
