@@ -1,5 +1,5 @@
 import levrt
-from lev.aorona.cewlcupp import CeWLCUPP
+from lev.aorona.cewlcupp import cewlcupp
 
 async def main():
     print("""
@@ -7,7 +7,7 @@ async def main():
     Testing CeWL + CUPP
     ----------------------
     """)
-    doc = await CeWLCUPP.Wordlist(
+    doc = await cewlcupp.Wordlist(
         url = 'https://levi.zone/',
         depth = 1,
         min_length = 5,

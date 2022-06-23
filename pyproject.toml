@@ -1,6 +1,6 @@
 [project]
-name = "lev.aorona.CeWLCUPP"
-version = "0.1.2"
+name = "lev.aorona.cewlcupp"
+version = "0.1.0"
 description = ""
 dynamic = ["classifiers"]
 requires-python = ">=3.10"
