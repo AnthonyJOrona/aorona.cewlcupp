@@ -8,8 +8,6 @@ Version: v1.4.0
 from levrt import Cr, annot, ctx, remote, File
 from levrt.annot.cats import Attck
 
-from util import init_logger
-
 # https://stackoverflow.com/questions/58751357/python-script-pexpect-hangs-on-child-wait
 
 @annot.meta(
@@ -50,7 +48,9 @@ async def Wordlist(
         import pexpect, logging
         cewl_file = 'cewl_file'
         try:
-            logger = init_logger(logging)
+            logging.basicConfig()
+            logger = logging.getLogger("lev")
+            logger.setLevel(logging.DEBUG)
             options_str = f'-k -m{min_length} -d{depth} -w {cewl_file}' 
             if offsite:
                 options_str = f'{options_str} -o'
