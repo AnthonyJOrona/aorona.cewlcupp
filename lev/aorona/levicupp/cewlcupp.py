@@ -1,3 +1,10 @@
+"""
+CeWL (5.4.9) + CUPP (0.0+20190501)
+Homepage: -
+GitHub: -
+Type: IMAGE-BASED
+Version: v1.4.0
+"""
 from levrt import Cr, annot, ctx, remote, File
 from levrt.annot.cats import Attck
 

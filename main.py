@@ -1,5 +1,5 @@
 import levrt
-from lev.aorona.levicupp import CeWLCUPP
+from lev.aorona.cewlcupp import CeWLCUPP
 
 async def main():
     print("""
