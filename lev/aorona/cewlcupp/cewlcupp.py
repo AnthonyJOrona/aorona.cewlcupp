@@ -192,7 +192,7 @@ async def CewlCupp(
     return Cr("", entry=entry())
 
 __lev__ = annot.meta(
-    [cewl, cupp_interactive, cewlcupp],
+    [Cewl, Cupp_User_Profile, CewlCupp],
     desc = "CeWL (5.4.9) + CUPP (0.0+20190501)",
     cats = {
         Attck: [
