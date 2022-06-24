@@ -3,12 +3,12 @@ CeWL (5.4.9) + CUPP (0.0+20190501)
 Homepage: -
 GitHub: -
 Type: IMAGE-BASED
-Version: v1.4.0
+Version: v1.0.4
 """
-from levrt import Cr, annot, ctx, remote, File
-from levrt.annot.cats import Attck
 
-from .util import newlinestr_to_json, expect_str
+import levrt
+from levrt import Cr, annot, ctx, remote
+from levrt.annot.cats import Attck
 
 # https://stackoverflow.com/questions/58751357/python-script-pexpect-hangs-on-child-wait
 # https://stackoverflow.com/questions/26081820/regular-expression-to-extract-whole-sentences-with-matching-word
@@ -33,9 +33,11 @@ async def Cewl(
     min_length: int = 3,
     offsite: bool = False,
 ) -> Cr:
-    @remote
+    """
+    """
+    @levrt.remote
     def entry():
-        import pexpect, logging, traceback
+        import pexpect, logging, traceback, json
         cewl_file = 'cewl_file'
         try:
             logging.basicConfig()
@@ -55,10 +57,13 @@ async def Cewl(
             if cewl_child.isalive():
                 cewl_child.wait()
             logger.debug('CeWL completed..')
-            ctx.set(wordlist=newlinestr_to_json(cewl_file))
+            with open(cewl_file, 'r') as f:
+                lines = f.readlines()
+            wordlist = json.dumps([line.rstrip() for line in lines])
+            ctx.set(wordlist=wordlist)
         except Exception as e:
             ctx.set(msg=f"Error running cewl: {e} {traceback.print_exc()}")
-    return Cr("", entry=entry())
+    return Cr("5991d9084fbd", entry=entry())
 
 @annot.meta(
     desc="User Profiling : cupp -i",
@@ -75,7 +80,6 @@ async def Cewl(
         annot.Param("childs_birthday", "Password Creator's Child's Birthday"),
         annot.Param("pets_name", "Password Creator's Pet's Name"),
         annot.Param("company", "Password Creator's Company"),
-        annot.Param("keywords", "Add words related to the Password Creator?"),
         annot.Param("related_words", "Words related to the Password Creator"),
         annot.Param("special_chars", "Add special chars at the end of words"),
         annot.Param("random_nums", "Some random numbers at the end of words"),
@@ -100,7 +104,6 @@ async def Cupp_User_Profile(
     childs_birthday = "\n", 
     pets_name: str = "\n",
     company: str = "\n",
-    keywords: bool = False,
     related_words: str = "\n",
     concatenate: bool = False,
     special_chars: bool = False,
@@ -113,9 +116,15 @@ async def Cupp_User_Profile(
     await Cupp_User_Profiling(...)
     ```
     """
-    @remote
+    @levrt.remote
     def entry():
-        import pexpect, logging
+        import pexpect, logging, json, traceback
+        def expect_str(child, search_str, desc, user_input, logger):
+            logger.debug(f'{desc} before')
+            child.expect([f"[^.?!]*(?<=[.?\s!]){search_str}(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
+            child.sendline(user_input)
+            logger.debug(f'{desc} after')
+
         try:
             logging.basicConfig()
             logger = logging.getLogger("lev")
@@ -137,14 +146,18 @@ async def Cupp_User_Profile(
             expect_str(cupp_child, 'name', 'Company Name', company, logger)
             expect_str(cupp_child, 'key words', 'Keywords', "Y", logger)
             expect_str(cupp_child, 'enter the words', 'Keywords List', related_words, logger)
+            expect_str(cupp_child, 'concatenate', 'concatenate', "Y" if concatenate else "N", logger)
             expect_str(cupp_child, 'special chars', 'special_chars', "Y" if special_chars else "N", logger)
             expect_str(cupp_child, 'random numbers', 'random_nums', "Y" if random_nums else "N", logger)
             expect_str(cupp_child, 'Leet mode', 'leet', "Y" if leet else "N", logger)
-            ctx.set(wordlist=newlinestr_to_json(f'{first_name}.txt'))
+            with open(f'{first_name}.txt', 'r') as f:
+                lines = f.readlines()
+            wordlist = json.dumps([line.rstrip() for line in lines])
+            ctx.set(wordlist=wordlist)
             ctx.set(msg="Success")
-        except:
+        except Exception as e:
             ctx.set(msg=f"Error running Cupp_User_Profile: {e} {traceback.print_exc()}")
-    return Cr("", entry=entry())
+    return Cr("5991d9084fbd", entry=entry())
 
 async def CewlCupp(
     url: str =  '',
@@ -156,9 +169,15 @@ async def CewlCupp(
     random_nums: bool = False,
     leet: bool = False,
 ) -> Cr:
-    @remote
+    """"""
+    @levrt.remote
     def entry():
-        import pexpect, logging, traceback
+        import pexpect, logging, traceback, json
+        def expect_str(child, search_str, desc, user_input, logger):
+            logger.debug(f'{desc} before')
+            child.expect([f"[^.?!]*(?<=[.?\s!]){search_str}(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
+            child.sendline(user_input)
+            logger.debug(f'{desc} after')
         cewl_file = "cewl_file"
         try:
             logging.basicConfig()
@@ -186,10 +205,13 @@ async def CewlCupp(
             expect_str(cupp_child, 'random', 'random', "Y" if random_nums else "N", logger)
             expect_str(cupp_child, 'Leet', 'Leet', "Y" if leet else "N", logger)
             ctx.set(msg="Success")
-            ctx.set(wordlist=newlinestr_to_json(f'{cewl_file}.cupp.txt'))
+            with open(f'{cewl_file}.cupp.txt', 'r') as f:
+                lines = f.readlines()
+            wordlist = json.dumps([line.rstrip() for line in lines])
+            ctx.set(wordlist=wordlist)
         except Exception as e:
-            ctx.set(msg=f"Error running Wordlist: {e} {traceback.print_exc()}")
-    return Cr("", entry=entry())
+            ctx.set(msg=f"Error running CewlCupp: {e} {traceback.print_exc()}")
+    return Cr("5991d9084fbd", entry=entry())
 
 __lev__ = annot.meta(
     [Cewl, Cupp_User_Profile, CewlCupp],
