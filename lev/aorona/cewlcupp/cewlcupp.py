@@ -8,11 +8,13 @@ Version: v1.4.0
 from levrt import Cr, annot, ctx, remote, File
 from levrt.annot.cats import Attck
 
+from .util import newlinestr_to_json, expect_str
+
 # https://stackoverflow.com/questions/58751357/python-script-pexpect-hangs-on-child-wait
 # https://stackoverflow.com/questions/26081820/regular-expression-to-extract-whole-sentences-with-matching-word
 
 @annot.meta(
-    desc="Dictionary: cupp -w <file>",
+    desc="Run CeWL against a url",
     params=[
         annot.Param("depth", "depth to spider"),
         annot.Param("min_length", "minimum word length"),
@@ -31,8 +33,6 @@ async def Cewl(
     min_length: int = 3,
     offsite: bool = False,
 ) -> Cr:
-    """
-    """
     @remote
     def entry():
         import pexpect, logging, traceback
@@ -55,25 +55,10 @@ async def Cewl(
             if cewl_child.isalive():
                 cewl_child.wait()
             logger.debug('CeWL completed..')
+            ctx.set(wordlist=newlinestr_to_json(cewl_file))
         except Exception as e:
             ctx.set(msg=f"Error running cewl: {e} {traceback.print_exc()}")
     return Cr("", entry=entry())
-
-@annot.meta(
-    desc="Dictionary: cupp -w <file>",
-    params=[
-        annot.Param("depth", "depth to spider"),
-        annot.Param("min_length", "minimum word length"),
-        annot.Param("offsite", "allow spider to visit other sites"),
-        annot.Param("url", "url to spider"),
-        annot.Param("concatenate", "concatenate all words from wordlist"),
-        annot.Param("special_chars", "add special chars at the end of words"),
-        annot.Param("random_nums", "some random numbers at the end of words"),
-        annot.Param("leet", " Leet mode"),
-    ],
-    cats=[Attck.PrivilegeEscalation, Attck.CredentialAccess, Attck.LateralMovement],
-)
-
 
 @annot.meta(
     desc="User Profiling : cupp -i",
@@ -87,13 +72,13 @@ async def Cewl(
         annot.Param("partners_birthday", "Password Creator's Partner's Birthday (DDMMYYYY)"),
         annot.Param("childs_name", "Password Creator's Child's Name"),
         annot.Param("childs_nickname", "Password Creator's Child's Nickname"),
-        annot.Param("childs_birthday", "Password Creator's Child's Birthday")
+        annot.Param("childs_birthday", "Password Creator's Child's Birthday"),
         annot.Param("pets_name", "Password Creator's Pet's Name"),
         annot.Param("company", "Password Creator's Company"),
-        annot.Param("keywords", "Add words related to the Password Creator?")
+        annot.Param("keywords", "Add words related to the Password Creator?"),
         annot.Param("related_words", "Words related to the Password Creator"),
         annot.Param("special_chars", "Add special chars at the end of words"),
-        annot.Param("random_nums", "some random numbers at the end of words"),
+        annot.Param("random_nums", "Some random numbers at the end of words"),
         annot.Param("leet", " Leet mode")
     ],
     cats=[
@@ -130,120 +115,36 @@ async def Cupp_User_Profile(
     """
     @remote
     def entry():
-        import pexpect, logging, json
+        import pexpect, logging
         try:
             logging.basicConfig()
             logger = logging.getLogger("lev")
             logger.setLevel(logging.DEBUG)
-
             logger.debug('Spawning CUPP..')
             cupp_child = pexpect.spawn('cupp -i')
             logger.debug('CUPP spawned')
-
-            logger.debug('First Name')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])Name(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(first_name)
-            logger.debug('First Name Added')
-
-            logger.debug('Last Name')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])Surname(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(surname)
-            logger.debug('Last Name Added')
-
-            logger.debug('Nickname')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])Nickname(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(nickname)
-            logger.debug('Nickname Added')
-
-            logger.debug('Birthday')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])DDMMYYYY(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(birthday)
-            logger.debug('Birthday Added')
-
-            logger.debug('Partner\'s Name')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])Name(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(partners_name)
-            logger.debug('Partner\'s First Name Added')
-
-            logger.debug('Partner\'s Nickname')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])nickname(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(partners_nickname)
-            logger.debug('Partner\'s Nickname Added')
-
-            logger.debug('Partner\'s Birthday')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])DDMMYYYY(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(partners_birthday)
-            logger.debug('Partner\'s Birthday Added')
-
-            logger.debug('Child\'s Name')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])name(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(childs_name)
-            logger.debug('Child\'s Name Added')
-
-            logger.debug('Child\'s Nickname')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])nickname(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(childs_nickname)
-            logger.debug('Child\'s Nickname Added')
-
-            logger.debug('Child\'s Birthday')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])DDMMYYYY(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(childs_birthday)
-            logger.debug('Child\'s Birthday Added')
-
-            logger.debug('Pet\'s Name')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])name(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(pets_name)
-            logger.debug('Pet\'s Name Added')
-
-            logger.debug('Company')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])name(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline(company)
-            logger.debug('Company Added')
-
-            logger.debug('Keywords')
-            cupp_child.expect("> Do you want to add some key words about the victim? Y/[N]:")
-            cupp_child.sendline("Y" if keywords else "N")
-            logger.debug('Keywords')
-
-            logger.debug('Keywords List')
-            cupp_child.expect("> Please enter the words, separated by comma. [i.e. hacker,juice,black], spaces will be removed:")
-            cupp_child.sendline(related_words)
-            logger.debug('Keywords List')
-
-            # Other Options. 
-
-            logger.debug('before special_chars')
-            cupp_child.expect("> Do you want to add special chars at the end of words? Y/[N]:")
-            cupp_child.sendline("Y" if special_chars else "N")
-            logger.debug('after special_chars')
-
-            logger.debug('before random_nums')
-            cupp_child.expect("> Do you want to add some random numbers at the end of words? Y/[N]:")
-            cupp_child.sendline("Y" if random_nums else "N")
-            logger.debug('after random_nums')
-
-            logger.debug('before leet')
-            cupp_child.expect("> Leet mode? (i.e. leet = 1337) Y/[N]:")
-            cupp_child.sendline("Y" if leet else "N")
-            logger.debug('after leet')
-
-            logger.debug('before hyperspeed')
-            cupp_child.expect("> Hyperspeed Print? (Y/n) :")
-            cupp_child.sendline("N")
-            logger.debug('after hyperspeed')
-
-            # TODO: Add names of program
-
-            with open('target.txt', 'r') as f:
-                lines = f.readlines()
-                wordlist = [line.rstrip() for line in lines]
-            
-            wordlist_json = json.dumps(wordlist)
-
-            ctx.set(wordlist=wordlist_jsons)
+            expect_str(cupp_child, 'Name', 'First Name', first_name, logger)
+            expect_str(cupp_child, 'Surname', 'Last Name', surname, logger)
+            expect_str(cupp_child, 'Nickname', 'Nickname', nickname, logger)
+            expect_str(cupp_child, 'DDMMYYYY', 'Birthdate', birthday, logger)
+            expect_str(cupp_child, 'Name', 'Partner\'s First Name', partners_name, logger)
+            expect_str(cupp_child, 'nickname', 'Partner\'s Nickname', partners_nickname, logger)
+            expect_str(cupp_child, 'DDMMYYYY', 'Partner\'s Nickname', partners_birthday, logger)
+            expect_str(cupp_child, 'name', 'Child\'s Name', childs_name, logger)
+            expect_str(cupp_child, 'nickname', 'Child\'s Nickname', childs_nickname, logger)
+            expect_str(cupp_child, 'nickname', 'Child\'s Birthday', childs_birthday, logger)
+            expect_str(cupp_child, 'DDMMYYYY', 'Pet\'s Name', pets_name, logger)
+            expect_str(cupp_child, 'name', 'Company Name', company, logger)
+            expect_str(cupp_child, 'key words', 'Keywords', "Y" if keywords else "N", logger)
+            expect_str(cupp_child, 'enter the words', 'Keywords List', related_words, logger)
+            expect_str(cupp_child, 'special chars', 'special_chars', "Y" if special_chars else "N", logger)
+            expect_str(cupp_child, 'random numbers', 'random_nums', "Y" if random_nums else "N", logger)
+            expect_str(cupp_child, 'Leet mode', 'leet', "Y" if leet else "N", logger)
+            expect_str(cupp_child, 'Hyperspeed Print', 'hyperspeed', "N", logger)
+            ctx.set(wordlist=newlinestr_to_json(f'{first_name}.txt'))
             ctx.set(msg="Success")
         except:
-            ctx.set(msg="Fail")
+            ctx.set(msg=f"Error running Cupp_User_Profile: {e} {traceback.print_exc()}")
     return Cr("", entry=entry())
 
 async def CewlCupp(
@@ -278,19 +179,15 @@ async def CewlCupp(
             if cewl_child.isalive():
                 cewl_child.wait()
             logger.debug('CeWL completed..')
-
             # 2) Run CUPP
             logger.debug('Running CUPP..')
             cupp_child = pexpect.spawn(f'cupp -w {cewl_file}')
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])concatenate(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline("Y" if concatenate else "N")
-            cupp_child.expect([">[^.?!]*(?<=[.?\s!])special(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline("Y" if special_chars else "N")
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])random(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline("Y" if random_nums else "N")
-            cupp_child.expect(["[^.?!]*(?<=[.?\s!])Leet(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
-            cupp_child.sendline("Y" if leet else "N")
+            expect_str(cupp_child, 'concatenate', 'concatenate', "Y" if concatenate else "N", logger)
+            expect_str(cupp_child, 'special', 'special_chars', "Y" if special_chars else "N", logger)
+            expect_str(cupp_child, 'random', 'random', "Y" if random_nums else "N", logger)
+            expect_str(cupp_child, 'Leet', 'Leet', "Y" if leet else "N", logger)
             ctx.set(msg="Success")
+            ctx.set(wordlist=newlinestr_to_json(f'{first_name}.txt'))
         except Exception as e:
             ctx.set(msg=f"Error running Wordlist: {e} {traceback.print_exc()}")
     return Cr("", entry=entry())
