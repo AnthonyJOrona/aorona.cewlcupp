@@ -34,6 +34,7 @@ async def Cewl(
     offsite: bool = False,
 ) -> Cr:
     """
+        Cewl
     """
     @levrt.remote
     def entry():
@@ -91,6 +92,7 @@ async def Cewl(
         Attck.LateralMovement
     ],
 )
+
 async def Cupp_User_Profile(
     first_name: str = "User",
     surname: str = "\n",
@@ -124,7 +126,6 @@ async def Cupp_User_Profile(
             child.expect([f"[^.?!]*(?<=[.?\s!]){search_str}(?=[\s.?!])[^.?!]*[.?!]", pexpect.EOF])
             child.sendline(user_input)
             logger.debug(f'{desc} after')
-
         try:
             logging.basicConfig()
             logger = logging.getLogger("lev")
@@ -159,6 +160,21 @@ async def Cupp_User_Profile(
             ctx.set(msg=f"Error running Cupp_User_Profile: {e} {traceback.print_exc()}")
     return Cr("5991d9084fbd", entry=entry())
 
+@annot.meta(
+    desc="CewL + CUPP",
+    params=[
+        annot.Param("depth", "depth to spider"),
+        annot.Param("min_length", "minimum word length"),
+        annot.Param("offsite", "allow spider to visit other sites"),
+        annot.Param("url", "url to spider"),
+        annot.Param("word_list", "word list"),
+        annot.Param("concatenate", "concatenate all words from wordlist"),
+        annot.Param("special_chars", "add special chars at the end of words"),
+        annot.Param("random_nums", "some random numbers at the end of words"),
+        annot.Param("leet", " Leet mode"),
+    ],
+    cats=[Attck.PrivilegeEscalation, Attck.CredentialAccess, Attck.LateralMovement],
+)
 async def CewlCupp(
     url: str =  '',
     depth: int = 1,
@@ -169,8 +185,10 @@ async def CewlCupp(
     random_nums: bool = False,
     leet: bool = False,
 ) -> Cr:
-    """"""
-    @levrt.remote
+    """
+    CewlCupp
+    """
+    @remote
     def entry():
         import pexpect, logging, traceback, json
         def expect_str(child, search_str, desc, user_input, logger):
@@ -214,7 +232,7 @@ async def CewlCupp(
     return Cr("5991d9084fbd", entry=entry())
 
 __lev__ = annot.meta(
-    [Cewl, Cupp_User_Profile, CewlCupp],
+    [Cewl, Cupp_User_Profile],
     desc = "CeWL (5.4.9) + CUPP (0.0+20190501)",
     cats = {
         Attck: [
