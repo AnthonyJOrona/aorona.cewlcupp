@@ -36,7 +36,7 @@ async def Cewl(
     @remote
     def entry():
         import pexpect, logging, traceback
-        cewl_file = '/cewl_file'
+        cewl_file = 'cewl_file'
         try:
             logging.basicConfig()
             logger = logging.getLogger("lev")
@@ -127,20 +127,19 @@ async def Cupp_User_Profile(
             expect_str(cupp_child, 'Surname', 'Last Name', surname, logger)
             expect_str(cupp_child, 'Nickname', 'Nickname', nickname, logger)
             expect_str(cupp_child, 'DDMMYYYY', 'Birthdate', birthday, logger)
-            expect_str(cupp_child, 'Name', 'Partner\'s First Name', partners_name, logger)
+            expect_str(cupp_child, 'name', 'Partner\'s Name', partners_name, logger)
             expect_str(cupp_child, 'nickname', 'Partner\'s Nickname', partners_nickname, logger)
-            expect_str(cupp_child, 'DDMMYYYY', 'Partner\'s Nickname', partners_birthday, logger)
+            expect_str(cupp_child, 'DDMMYYYY', 'Partner\'s birthdate', partners_birthday, logger)
             expect_str(cupp_child, 'name', 'Child\'s Name', childs_name, logger)
             expect_str(cupp_child, 'nickname', 'Child\'s Nickname', childs_nickname, logger)
-            expect_str(cupp_child, 'nickname', 'Child\'s Birthday', childs_birthday, logger)
-            expect_str(cupp_child, 'DDMMYYYY', 'Pet\'s Name', pets_name, logger)
+            expect_str(cupp_child, 'DDMMYYYY', 'Child\'s Birthday', childs_birthday, logger)
+            expect_str(cupp_child, 'name', 'Pet\'s Name', pets_name, logger)
             expect_str(cupp_child, 'name', 'Company Name', company, logger)
-            expect_str(cupp_child, 'key words', 'Keywords', "Y" if keywords else "N", logger)
+            expect_str(cupp_child, 'key words', 'Keywords', "Y", logger)
             expect_str(cupp_child, 'enter the words', 'Keywords List', related_words, logger)
             expect_str(cupp_child, 'special chars', 'special_chars', "Y" if special_chars else "N", logger)
             expect_str(cupp_child, 'random numbers', 'random_nums', "Y" if random_nums else "N", logger)
             expect_str(cupp_child, 'Leet mode', 'leet', "Y" if leet else "N", logger)
-            expect_str(cupp_child, 'Hyperspeed Print', 'hyperspeed', "N", logger)
             ctx.set(wordlist=newlinestr_to_json(f'{first_name}.txt'))
             ctx.set(msg="Success")
         except:
@@ -160,7 +159,7 @@ async def CewlCupp(
     @remote
     def entry():
         import pexpect, logging, traceback
-        cewl_file = "/cewl_file"
+        cewl_file = "cewl_file"
         try:
             logging.basicConfig()
             logger = logging.getLogger("lev")
@@ -187,7 +186,7 @@ async def CewlCupp(
             expect_str(cupp_child, 'random', 'random', "Y" if random_nums else "N", logger)
             expect_str(cupp_child, 'Leet', 'Leet', "Y" if leet else "N", logger)
             ctx.set(msg="Success")
-            ctx.set(wordlist=newlinestr_to_json(f'{first_name}.txt'))
+            ctx.set(wordlist=newlinestr_to_json(f'{cewl_file}.cupp.txt'))
         except Exception as e:
             ctx.set(msg=f"Error running Wordlist: {e} {traceback.print_exc()}")
     return Cr("", entry=entry())
